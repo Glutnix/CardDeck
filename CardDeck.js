@@ -89,10 +89,9 @@ CardDeck.prototype.sort = function () {
 
 CardDeck.prototype.dealHand = function (size) {
 	size = size || this.settings.handSize;
-	var hand = [];
+	var hand = new CardDeck.Hand(this);
 	for (var i = 0; i < size; i += 1) {
-		var card = this.theDeck.pop();
-		hand.push(card);
+		hand.addCard( this.theDeck.pop() );
 	}
 	return hand;
 };
@@ -115,4 +114,45 @@ CardDeck.Card = function (rankIndex, suitIndex, deck, deckID) {
 	this.suitIndex = suitIndex;
 	this.suit = deck.settings.suits[suitIndex] || (joker ? "Joker" : "");
 	this.deckID = deckID;
+};
+
+CardDeck.Card.prototype.toString = function() {
+	return this.rank + " " + this.suit;
+};
+
+CardDeck.Hand = function (deck) {
+	this.deck = deck;
+	this.theHand = [];
+};
+
+CardDeck.Hand.prototype.toString = function () {
+	return this.theHand.toString();
+};
+
+CardDeck.Hand.prototype.addCard = function (card) {
+	this.theHand.push(card);
+};
+
+CardDeck.Hand.prototype.isOfAKind = function (exactCount, excludeRankIndexes) {
+	// returns highest rankIndex when it finds exactCount;
+	excludeRankIndexes = excludeRankIndexes || [];
+	var i;
+	var tally = {};
+	for (i = 0; i < this.deck.settings.ranks.length; i += 1) {
+		tally[i] = 0;
+	}
+
+	for (i = 0; i < this.theHand.length; i += 1) {
+		var theCard = this.theHand[i];
+		if (excludeRankIndexes.indexOf(theCard.rankIndex)) {
+			tally[ this.deck.settings.ranks[ theCard.rankIndex ] ] += 1;
+		}
+	}
+
+	for (i = this.deck.settings.ranks.length-1; i >= 0 ; i -= 1) {
+		if (tally[ this.deck.settings.ranks[i] ] === exactCount) {
+			return i;
+		}
+	}
+	return false;
 };
