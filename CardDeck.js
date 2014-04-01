@@ -7,7 +7,8 @@ var CardDeck = function (settings) {
 		handSize: 5,
 		ranks: "2,3,4,5,6,7,8,9,10,Jack,Queen,King,Ace".split(","),
 		suits: "Clubs,Diamonds,Hearts,Spades".split(","),
-		jokers: ["Black","Red"]
+		jokers: ["Black","Red"],
+		shuffle: true
 	};
 
 	this.theDeck = [];
@@ -19,7 +20,11 @@ var CardDeck = function (settings) {
 
 CardDeck.prototype.initialize = function () {
 	this.populateDeck();
-	this.sort();
+	if (this.settings.shuffle) {
+		this.shuffle();
+	} else {
+		this.sort();
+	}
 	return this;
 };
 
