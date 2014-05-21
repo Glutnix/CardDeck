@@ -7,10 +7,21 @@
 <body>
 	<script src="CardDeck.js"></script>
 	<script>
-		var deck = new CardDeck({
-			decks: 2
-		});
-		console.log(JSON.stringify(deck.theDeck));
+
+		var tries = 0;
+		do {
+			tries += 1;
+			var deck = new CardDeck({
+				decks: 2
+			});
+			var hand = deck.dealHand();
+			var rank = hand.isARoyalFlush();
+			if (tries % 10000 === 0) { console.log(tries + "tries"); }
+		} while (!rank);
+
+		console.log(hand, tries, rank);
+
+
 	</script>
 </body>
 </html>

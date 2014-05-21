@@ -156,3 +156,62 @@ CardDeck.Hand.prototype.isOfAKind = function (exactCount, excludeRankIndexes) {
 	}
 	return false;
 };
+
+CardDeck.Hand.prototype.isAPair = function () {
+	return this.isOfAKind(2);
+}
+
+CardDeck.Hand.prototype.isAFlush = function () {
+	// all five cards must share the same suit.
+
+	var firstCard = this.theHand[0]
+	var firstSuit = firstCard.suitIndex;
+	for (var i = 1; i < this.theHand.length; i += 1) {
+		var card = this.theHand[i];
+		if (card.suitIndex !== firstSuit) return false;
+	}
+	return true;
+}
+
+CardDeck.Hand.prototype.isAFullHouse = function () {
+	if (this.theHand.length !== 5) throw new Error("isAFullHouse currently only supports hands with 5 cards.");
+	var three = this.isOfAKind(3);
+	if (three) {
+		return this.isOfAKind(2, [three]);
+	}
+	return false;
+}
+
+CardDeck.Hand.prototype.isAStraight = function () {
+	if (this.theHand.length !== 5) throw new Error("isAStraight currently only supports hands with 5 cards.");
+	var count = [];
+	for (var i = 0; i < this.deck.settings.ranks.length; i += 1) {
+		count[i] = 0;
+	}
+	// count suits
+	for (var i = 0; i < this.theHand.length; i += 1) {
+		var rank = this.theHand[i].rankIndex;
+		if ( count[rank] > 0) {
+			// found a pair, can't be a straight
+			return false;
+		}
+		count[rank] += 1;
+	}
+	for (var i = this.deck.settings.ranks.length; i >= 4; i -= 1) {
+		if (count[i] === 1 && count[i-1] === 1 && count[i-2] === 1 && count[i-3] === 1 && count[i-4] === 1) {
+			return i;
+		}
+	}
+	return false;
+}
+
+CardDeck.Hand.prototype.isAStraightFlush = function () {
+	if (this.isAFlush()) {
+		return this.isAStraight();
+	}
+	return false;
+}
+
+CardDeck.Hand.prototype.isARoyalFlush = function () {
+	return this.isAStraightFlush() === this.deck.settings.ranks.length-1;
+}
